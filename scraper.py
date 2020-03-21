@@ -26,13 +26,15 @@ def scrape(path):
       if(url != ""):
         resolve += 1
         domain = url.split("/")[2]
+        if domain == "journal.yiigle.com":
+          print(row)
+          print(url)
         if domain == "linkinghub.elsevier.com":
           res2 = requests.get(url)
           soup = BeautifulSoup(res2.text)
           ele = soup.find("input")
           url2 = ele.get("value")
           domain = url2.split("%2F")[2]
-          print(domain)
         if(domain_count.get(domain, "") == ""):
           domain_count[domain] = 1
         else:
