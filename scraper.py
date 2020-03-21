@@ -32,8 +32,15 @@ def download_url(url, target, title):
   session = requests.Session()
   try: 
     res = session.get(url)
-    content = res.content
     domain = res.url.split("/")[2]
+    if domain == "linkinghub.elsevier.com":
+      res2 = requests.get(url)
+      soup = BeautifulSoup(res2.text)
+      ele = soup.find("input")
+      url2 = ele.get("value").replace('%2F', "/")
+      domain = url2.split("%2F")[2]
+      res = session.get(url2)
+    content = res.content
   except: 
     print("error")
     print(url)
