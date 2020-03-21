@@ -21,9 +21,10 @@ def scrape(path, collection, target):
     for row in reader:
       count += 1
       doi = collection.doi(row[10])
-      if(doi != None || row[10] == ""):
+      if(doi != None):
         url = doi.get("URL", "")
-        download_url(url, target, row[0])
+        if(url != ""):
+          download_url(url, target, row[0])
       if(count % 100 == 0):
         print(count)
     print("Scraped!")
@@ -40,16 +41,17 @@ def download_url(url, target, title):
       url2 = ele.get("value").replace('%2F', "/")
       domain = url2.split("%2F")[2]
       res = session.get(url2)
-    content = res.content
   except: 
     print("error")
     print(url)
     return 
   if(res.status_code == 200 and domain == "link.springer.com"):
+    content = res.content
     soup = BeautifulSoup(content)
     link = soup.findAll("a", {"class": "c-pdf-download__link"})[0]
     pdf = requests.get("https:" + link.get('href'))
     open(target + "/" + title + ".pdf", 'wb').write(pdf.content)
+  # elif(res.status_code == 200 and domain == )
 
 
 
