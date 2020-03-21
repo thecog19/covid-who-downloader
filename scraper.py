@@ -80,7 +80,10 @@ def download_url(url, target, title):
         return
       else:
         pdfkit.from_url(body, path) 
-      print("sciencemag: " + url)
+    elif(domain == "www.nature.com"):
+      link = soup.findAll("a", {"data-track-label": "PDF download"})[0]
+      pdf = requests.get("https:" + link.get('href'))
+      open(target + "/" + title + ".pdf", 'wb').write(pdf.content)
 
 main("csv.csv")
 # download_url("http://dx.doi.org/10.1007/s11604-020-00948-y", "../covid", "felipe")
