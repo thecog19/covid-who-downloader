@@ -21,7 +21,7 @@ def scrape(path, collection, target):
     for row in reader:
       count += 1
       doi = collection.doi(row[10])
-      if(doi != None):
+      if(doi != None || row[10] == ""):
         url = doi.get("URL", "")
         download_url(url, target, row[0])
       if(count % 100 == 0):
@@ -36,6 +36,7 @@ def download_url(url, target, title):
     domain = res.url.split("/")[2]
   except: 
     print("error")
+    print(url)
     return 
   if(res.status_code == 200 and domain == "link.springer.com"):
     soup = BeautifulSoup(content)
@@ -46,5 +47,5 @@ def download_url(url, target, title):
 
 
 
-# main("csv.csv")
-download_url("http://dx.doi.org/10.1007/s11604-020-00948-y", "../covid", "felipe")
+main("csv.csv")
+# download_url("http://dx.doi.org/10.1007/s11604-020-00948-y", "../covid", "felipe")
