@@ -18,11 +18,13 @@ def scrape(path):
     reader = csv.reader(file)
     count = 0
     domain_count = {}
+    resolve = 0
     for row in reader:
       count += 1
       res = requests.get("https://doi.org/api/handles/" + row[10])
       url = json.loads(res.content).get("values", [{}])[0].get("data", {}).get("value", "")
       if(url != ""):
+        resolve += 1
         domain = url.split("/")[2]
         print(domain)
         if(domain_count.get(domain, "") == ""):
