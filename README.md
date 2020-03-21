@@ -11,3 +11,11 @@ We use beautiful soup for parsing and crossrefapi for resolving the DOI.
 We use pdfkit to convert websites that do not offer pdf downloads into pdfs.
 `sudo apt-get install wkhtmltopdf`
 `pip3 install pdfkit`
+
+We use selenium to get the harder to get pdfs, which requires geckodriver
+`pip3 install selenium`
+`wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26
+.0-linux64.tar.gz`
+`tar -xvzf geckodriver*`
+`chmod +x geckodriver`
+`sudo mv geckodriver /usr/local/bin/`

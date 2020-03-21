@@ -48,8 +48,13 @@ def download_url(url, target, title):
       domain = url2.split("/")[2]
       res = session.get(url2)
   except Exception as e: 
-    print(e)
-    print(url)
+    print("SELENIUM BABY")
+    firefox = webdriver.Firefox()
+    firefox.set_page_load_timeout(30)
+    try:
+      process_webpage(url,firefox,"")
+    finally:
+      firefox.close()
     return 
   if(res.status_code == 200):
     content = res.content 
@@ -80,6 +85,54 @@ def download_url(url, target, title):
       link = soup.findAll("a", {"class": "show-pdf"})[0]
       pdf = requests.get("https://www.tandfonline.com" + link.get('href'))
       open(path, 'wb').write(pdf.content)
+
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.expected_conditions import presence_of_element_located, visibility_of_element_located, invisibility_of_element_located
+from selenium.webdriver.support.wait import WebDriverWait
+  
+# The first time this button is clicked per session:
+#   - Go into Firefox preferences, set the download location to the desired folder.
+# - Check 'Do this automatically for files of this type from now on'.
+
+def process_webpage(driver, page, domain):
+  if domain == 'onlinelibrary.wiley.com':
+    driver.get(page)
+    time.sleep(5)
+    pdfButton = driver.find_element_by_link_text("PDF")
+    pdfButton.click()
+    time.sleep(5)
+    pdf_container = driver.find_element_by_id('pdf-iframe')
+    iframe_url = pdf_container.get_attribute('src')
+    driver.get(iframe_url)
+    time.sleep(5)
+    downloadButton = driver.find_element_by_id('download')
+    downloadButton.click() 
+  elif domain == 'academic.oup.com':
+    driver.get(page)
+    time.sleep(5)
+    pdfButton = driver.find_element_by_link_text("PDF")
+    pdfButton.click()
+    time.sleep(5)
+    downloadButton = driver.find_element_by_id('download')
+    downloadButton.click()
+  else:
+    driver.get(page)
+    time.sleep(5)
+    pdfButton = driver.find_element_by_link_text("PDF")
+    pdfButton.click()
+    try:
+      downloadButton = driver.find_element_by_id('download')
+      downloadButton.click()
+    except:
+      pdf_container = driver.find_element_by_id('pdf-iframe')
+      iframe_url = pdf_container.get_attribute('src')
+      driver.get(iframe_url)
+      time.sleep(5)
+      downloadButton = driver.find_element_by_id('download')
+      downloadButton.click()
+
 
 main("csv.csv")
 # download_url("http://dx.doi.org/10.1007/s11604-020-00948-y", "../covid", "felipe")
