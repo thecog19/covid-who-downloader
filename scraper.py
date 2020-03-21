@@ -4,9 +4,20 @@ import csv
 from crossref.restful import Works
 import time
 import pdfkit 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.expected_conditions import presence_of_element_located, visibility_of_element_located, invisibility_of_element_located
+from selenium.webdriver.support.wait import WebDriverWait
+
+profile = webdriver.FirefoxProfile()
+profile.set_preference("browser.download.folderList", 2)
+profile.set_preference("browser.download.manager.showWhenStarting", False)
+profile.set_preference("browser.download.dir", "/home/felipe/programing/python/covid")
+profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/pdf")
+firefox = webdriver.Firefox(profile)
 
 
-
+firefox.set_page_load_timeout(60)
 def main(path, target="../covid", mode="files"):
   print("Initalizing scraping in " + mode +  "\n")
   collection = Works()
@@ -48,13 +59,12 @@ def download_url(url, target, title):
       domain = url2.split("/")[2]
       res = session.get(url2)
   except Exception as e: 
-    print("SELENIUM BABY")
-    firefox = webdriver.Firefox()
-    firefox.set_page_load_timeout(30)
+    print("selenium time")
     try:
-      process_webpage(url,firefox,"")
-    finally:
-      firefox.close()
+      process_webpage(firefox,url,"")
+    except Exception as e:
+      print("selenium error")
+      print(e)
     return 
   if(res.status_code == 200):
     content = res.content 
@@ -87,10 +97,7 @@ def download_url(url, target, title):
       open(path, 'wb').write(pdf.content)
 
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.expected_conditions import presence_of_element_located, visibility_of_element_located, invisibility_of_element_located
-from selenium.webdriver.support.wait import WebDriverWait
+
   
 # The first time this button is clicked per session:
 #   - Go into Firefox preferences, set the download location to the desired folder.
@@ -132,6 +139,7 @@ def process_webpage(driver, page, domain):
       time.sleep(5)
       downloadButton = driver.find_element_by_id('download')
       downloadButton.click()
+    time.sleep(10)
 
 
 main("csv.csv")
