@@ -70,12 +70,13 @@ def download_url(url, target, title):
       pdf = requests.get("https://www.bmj.com" + link.get('href'))
       open(path, 'wb').write(pdf.content)
     elif(domain == "www.sciencemag.org"):
-      print(url)
       body = soup.findAll("div", {"class": "article-body"})
       if(len(body) == 0):
         body = soup.findAll("div", {"class": "article__body"})
       
       if(len(body) == 0):
+        print("This article failed")
+        print(url)
         return
       else:
         pdfkit.from_url(body, path) 
