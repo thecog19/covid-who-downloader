@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import csv 
 from crossref.restful import Works
 import time
+import pdfkit 
 
 
 
@@ -26,7 +27,8 @@ def scrape(path, collection, target):
         if(url != ""):
           try: 
             download_url(url, target, row[0])
-          except Exception as e: 
+          except Exception as e:
+            print(url) 
             print(e)
       if(count % 100 == 0):
         print(count)
@@ -51,22 +53,33 @@ def download_url(url, target, title):
   if(res.status_code == 200):
     content = res.content 
     soup = BeautifulSoup(content, features="html.parser")
+    path = target + "/" + title + ".pdf"
     if(domain == "link.springer.com"):
       link = soup.findAll("a", {"class": "c-pdf-download__link"})[0]
       pdf = requests.get("https:" + link.get('href'))
-      open(target + "/" + title + ".pdf", 'wb').write(pdf.content)
+      open(path, 'wb').write(pdf.content)
     elif(domain == "journal.yiigle.com"):
       #chinese language articles, many of which have been removed
       return
     elif(domain == "www.thelancet.com"):
       link = soup.findAll("a", {"class": "article-tools__item__pdf"})[0]
       pdf = requests.get("https://www.thelancet.com" + link.get('href'))
-      open(target + "/" + title + ".pdf", 'wb').write(pdf.content)
+      open(path, 'wb').write(pdf.content)
     elif(domain == "www.bmj.com"):
       link = soup.findAll("a", {"class": "pdf-link"})[0]
       pdf = requests.get("https://www.bmj.com" + link.get('href'))
-      open(target + "/" + title + ".pdf", 'wb').write(pdf.content)
-      print("bmj!")
+      open(path, 'wb').write(pdf.content)
+    elif(domain == "www.sciencemag.org"):
+      print(url)
+      body = soup.findAll("div", {"class": "article-body"})
+      if(len(body) == 0):
+        body = soup.findAll("div", {"class": "article__body"})
+      
+      if(len(body) == 0):
+        return
+      else:
+        pdfkit.from_url(body, path) 
+      print("sciencemag: " + url)
 
 main("csv.csv")
 # download_url("http://dx.doi.org/10.1007/s11604-020-00948-y", "../covid", "felipe")

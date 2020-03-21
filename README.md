@@ -4,5 +4,10 @@ The WHO website provdies a [database of current research](https://www.who.int/em
 
 # Requirements
 We use beautiful soup for parsing and crossrefapi for resolving the DOI. 
+
 `pip3 install bf4`
 `pip3 install crossrefapi`
+
+We use pdfkit to convert websites that do not offer pdf downloads into pdfs.
+`sudo apt-get install wkhtmltopdf`
+`pip3 install pdfkit`
