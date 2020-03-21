@@ -7,19 +7,32 @@ from selenium.webdriver.support.expected_conditions import presence_of_element_l
 from selenium.webdriver.support.wait import WebDriverWait
 import time
 
-def get_pdf(driver, page):
-    driver.get(page)
-    wait = WebDriverWait(driver, 5)
-
-    containerLoaded = presence_of_element_located((By.ID, 'pdf-iframe'))
-    wait.until(containerLoaded)
-    pdf_container = driver.find_element_by_id('pdf-iframe')
-  
-    iframe_url = pdf_container.get_attribute('src')
-
-    driver.get(iframe_url)
-    downloadButton = driver.find_element_by_id('download')
-
-	downloadButton.click() # The first time this button is clicked per session, you have to manually set up the download location.
+def get_pdf(driver):
+	wait = WebDriverWait(driver, 5)
+	containerLoaded = presence_of_element_located((By.ID, 'pdf-iframe'))
+	wait.until(containerLoaded)
+	pdf_container = driver.find_element_by_id('pdf-iframe')
+	iframe_url = pdf_container.get_attribute('src')
+	driver.get(iframe_url)
+	time.sleep(5)
+	downloadButton = driver.find_element_by_id('download')
+	downloadButton.click() 
 	
+# The first time this button is clicked per session:
+# 	- Go into Firefox preferences, set the download location to the desired folder.
+#	- Check 'Do this automatically for files of this type from now on'.
+
+def process_webpage(driver, page, domain):
+	if domain == 'onlinelibrary.wiley.com':
+		driver.get(page)
+		wait = WebDriverWait(driver, 5)
+		pdfButton = driver.find_element_by_link_text("PDF")
+		pdfButton.click()
+		get_pdf(driver)
+	else:
+		driver.get(page)
+		wait = WebDriverWait(driver, 5)
+		pdfButton = driver.find_element_by_link_text("PDF")
+		pdfButton.click()
+		get_pdf(driver)	
 
