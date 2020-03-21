@@ -9,9 +9,9 @@ import time
 def main(path, target="../covid", mode="files"):
   print("Initalizing scraping in " + mode +  "\n")
   collection = Works()
-  scrape(path, collection)
+  scrape(path, collection, target)
 
-def scrape(path, collection):
+def scrape(path, collection, target):
   print("loading csv!")
   
   with open(path, 'r') as file:
@@ -23,17 +23,28 @@ def scrape(path, collection):
       doi = collection.doi(row[10])
       if(doi != None):
         url = doi.get("URL", "")
-        download_url(url)
+        download_url(url, target, row[0])
       if(count % 100 == 0):
         print(count)
     print("Scraped!")
 
-def download_url(url):
+def download_url(url, target, title):
   session = requests.Session()
-  time.sleep(10)
-  res = session.get(url)
-  content = res.content
-  print(content)
+  try: 
+    res = session.get(url)
+    content = res.content
+    domain = res.url.split("/")[2]
+  except: 
+    print("error")
+    return 
+  if(res.status_code == 200 and domain == "link.springer.com"):
+    soup = BeautifulSoup(content)
+    link = soup.findAll("a", {"class": "c-pdf-download__link"})[0]
+    pdf = requests.get("https:" + link.get('href'))
+    open(target + "/" + title + ".pdf", 'wb').write(pdf.content)
 
 
-main("csv.csv")
+
+
+# main("csv.csv")
+download_url("http://dx.doi.org/10.1007/s11604-020-00948-y", "../covid", "felipe")
