@@ -35,6 +35,7 @@ def scrape(path, collection, target):
     print("Scraped!")
 
 def download_url(url, target, title):
+  title = title.replace('/', "").replace(":", "").replace(" ", "")
   session = requests.Session()
   try: 
     res = session.get(url)
@@ -70,20 +71,15 @@ def download_url(url, target, title):
       pdf = requests.get("https://www.bmj.com" + link.get('href'))
       open(path, 'wb').write(pdf.content)
     elif(domain == "www.sciencemag.org"):
-      body = soup.findAll("div", {"class": "article-body"})
-      if(len(body) == 0):
-        body = soup.findAll("div", {"class": "article__body"})
-      
-      if(len(body) == 0):
-        print("This article failed")
-        print(url)
-        return
-      else:
-        pdfkit.from_url(body, path) 
+      pdfkit.from_url(url, path) 
     elif(domain == "www.nature.com"):
       link = soup.findAll("a", {"data-track-label": "PDF download"})[0]
       pdf = requests.get("https:" + link.get('href'))
-      open(target + "/" + title + ".pdf", 'wb').write(pdf.content)
+      open(path, 'wb').write(pdf.content)
+    elif(domain == "www.tandfonline.com"):
+      link = soup.findAll("a", {"class": "show-pdf"})[0]
+      pdf = requests.get("https://www.tandfonline.com" + link.get('href'))
+      open(path, 'wb').write(pdf.content)
 
 main("csv.csv")
 # download_url("http://dx.doi.org/10.1007/s11604-020-00948-y", "../covid", "felipe")
