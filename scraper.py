@@ -67,6 +67,10 @@ def download_url(url, target, title):
       pdf = requests.get("https://www.bmj.com" + link.get('href'))
       open(target + "/" + title + ".pdf", 'wb').write(pdf.content)
       print("bmj!")
+    elif(domain == "www.nature.com"):
+      link = soup.findAll("a", {"data-track-label": "PDF download"})[0]
+      pdf = requests.get("https:" + link.get('href'))
+      open(target + "/" + title + ".pdf", 'wb').write(pdf.content)
 
 main("csv.csv")
 # download_url("http://dx.doi.org/10.1007/s11604-020-00948-y", "../covid", "felipe")
