@@ -37,7 +37,7 @@ def scrape(path, collection, target):
         url = doi.get("URL", "")
         if(url != ""):
           try: 
-            download_url(url, target, row[0])
+            download_url(url, target, row[0].replace("/", "<replace>"))
           except Exception as e:
             print(url) 
             print(e)
@@ -46,7 +46,6 @@ def scrape(path, collection, target):
     print("Scraped!")
 
 def download_url(url, target, title):
-  title = title.replace('/', "").replace(":", "").replace(" ", "")
   session = requests.Session()
   try: 
     res = session.get(url)
